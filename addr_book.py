@@ -1,4 +1,5 @@
 from collections import UserDict
+import re
 
 class AddressBook(UserDict):
 
@@ -13,31 +14,45 @@ class AddressBook(UserDict):
     
 class Field:
     def __init__(self, value):
-        self.value = value
+        self._value = value
+
+    @property
+    def value(self):
+        return self._value
     
+    @value.setter
+    def value(self, new_value):
+        self._value = new_value
+
     def __repr__(self):
-        return f"{self.value}"
+        return f"{self._value}"
 
 class Name(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    pass
 
 
 class Phone(Field):
     def __init__(self, value):
-        super().__init__(value)
-    
+        self.value = value
 
-class Email(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    @Field.value.setter
+    def value(self, new_value):
+        result = re.findall(r"^(?=\+\d{3}\(\d{2}\)\d{3}-\d{1,2}-\d{2,3}).{17}$", new_value)
+        if not result:
+            raise ValueError
+        self._value = new_value
+   
+
+class Birthday(Field):
+    pass
 
 
 class Record:
-    def __init__(self, name:Name, phone:Phone = ''):
+    def __init__(self, name:Name, phone:Phone, birthday:Birthday = None):
         self.name = name
         self.phones = list()
         self.phones.append(phone)
+        self.birthday = birthday
     
     def add_phone(self, new_phone):
         self.phones.append(new_phone)
@@ -56,5 +71,11 @@ class Record:
                 return True
         return False
     
+    def add_birthday(self, birthday):
+        self.birthday = birthday
+
+    # def days_to_birthday(self, birthday):
+
+    
     def __repr__(self):
-        return f"Name: {self.name.value}, Phones: {self.phones}"
+        return f"Name: {self.name.value}, Phones: {self.phones}, Birthday: {self.birthday}"

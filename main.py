@@ -1,5 +1,4 @@
 from addr_book import *
-import inspect
 
 
 contacts = AddressBook()
@@ -12,7 +11,7 @@ def input_error(func):
         except KeyError:
             return "Error: key doesn't exist."
         except ValueError:
-            return "Error: phone can only contain digits."
+            return "Error: invalid phone format. Correct format is: +380(123)345-67-89"
         except IndexError:
             return "Error: provide both name and phone number."
         except TypeError:
@@ -31,11 +30,15 @@ def showall():
 
 
 @input_error
-def add(name:str, phone:str) -> None:
+def add(name:str, phone:str, *args) -> None:
     if name not in contacts.data:
         name = Name(name)
         phone = Phone(phone)
+        print(phone)
         rec = Record(name, phone)
+        if args:
+            birthday = Birthday(args[0])
+            rec.add_birthday(birthday)
         contacts.add_record(rec)
         return f"Success! {name} has been added to your contacts list."
     else:
