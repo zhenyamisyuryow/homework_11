@@ -11,7 +11,7 @@ def input_error(func):
         except KeyError:
             return "Error: key doesn't exist."
         except ValueError:
-            return "Error: invalid phone format. Correct format is: +380(123)345-67-89"
+            return "Error: invalid format. Correct format for phone is: +380(12)345-67-89. For birthday: DD-MM-YYYY"
         except IndexError:
             return "Error: provide both name and phone number."
         except TypeError:
@@ -26,24 +26,33 @@ def hello(*args):
 
 @input_error
 def showall():
-    return contacts.data
+    number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))
+    result = contacts.iterator(number)
+    for records_batch in result:
+        for i in records_batch:
+            print(i,"\n")
+        answer = input("Press Enter to continue. Press Q to exit.\n>>> ")
+        if answer.upper() == "Q":
+            break
+    return f"Total contacts: {len(contacts)}.\nEnter the command: "
 
 
 @input_error
-def add(name:str, phone:str, *args) -> None:
+def add(name:str, *args) -> None:
     if name not in contacts.data:
         name = Name(name)
-        phone = Phone(phone)
-        print(phone)
+        phone = Phone(args[0])
         rec = Record(name, phone)
-        if args:
-            birthday = Birthday(args[0])
+        if len(args) > 1:
+            birthday = Birthday(args[1])
             rec.add_birthday(birthday)
         contacts.add_record(rec)
         return f"Success! {name} has been added to your contacts list."
     else:
-        contacts[name].add_phone(Phone(phone))
-        return f"{phone} has been added to {name}"
+        if contacts[name].add_phone(Phone(args[0])):
+            return f"Phone {phone} has been added to {name}"
+        else:
+            return f"Error: Phone {phone} already exists."
 
 
 @input_error
