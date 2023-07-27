@@ -49,7 +49,8 @@ def add(name:str, *args) -> None:
         contacts.add_record(rec)
         return f"Success! {name} has been added to your contacts list."
     else:
-        if contacts[name].add_phone(Phone(args[0])):
+        phone = args[0]
+        if contacts[name].add_phone(Phone(phone)):
             return f"Phone {phone} has been added to {name}"
         else:
             return f"Error: Phone {phone} already exists."
